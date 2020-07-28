@@ -15,15 +15,10 @@ npm run serve
 npm run build
 ```
 
-### Run your unit tests
-```
-npm run test:unit
-```
+Simple demo:
 
-### Lints and fixes files
-```
-npm run lint
-```
-
-### Customize configuration
-See [Configuration Reference](https://cli.vuejs.org/config/).
+npm i  
+ganache with: ganache-cli -i 1337  
+truffle with truffle deploy  
+npm run serve  
+do the set and the the get, use correct addresseses
