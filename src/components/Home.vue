@@ -28,7 +28,13 @@
         </v-col>
 
         <v-col class="text-center" cols="5">
-          <v-text-field label="Value" v-model="targetValue" solo></v-text-field>
+          <v-file-input
+            @change="addFiles()"
+            label="File input"
+            v-model="files"
+          ></v-file-input>
+          <v-img :src="uploadedImg" contain></v-img>
+          <!-- <v-text-field label="Value" v-model="targetValue" solo></v-text-field> -->
         </v-col>
         <v-col class="text-center" cols="2">
           <v-btn small color="primary" @click="setSomeValue">Set</v-btn>
@@ -46,7 +52,10 @@ export default {
       searchAddress: "",
       searchValue: "",
       targetAddress: "",
-      targetValue: ""
+      targetValue: "",
+      files: [],
+      readers: [],
+      uploadedImg: ""
     };
   },
   methods: {
@@ -56,6 +65,17 @@ export default {
     async getSomeValue() {
       let value = await getValueFromAdd(this.searchAddress);
       this.searchValue = value;
+    },
+    addFiles() {
+      console.log("files", this.files);
+      this.readers[0] = new FileReader();
+      this.readers[0].onloadend = () => {
+        let fileData = this.readers[0].result;
+
+        console.log(fileData);
+        this.uploadedImg = fileData;
+      };
+      this.readers[0].readAsDataURL(this.files);
     }
   }
 };
