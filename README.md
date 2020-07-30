@@ -17,8 +17,19 @@ npm run build
 
 Simple demo:
 
+```
 npm i  
-ganache with: ganache-cli -i 1337  
-truffle with truffle deploy  
+```
+Start ganache in onw terminal:
+```
+ganache-cli -i 1337  
+```
+In a second terminal do:
+```
+cd truffle && truffle deploy
+```
+And in a third terminal:
+```  
 npm run serve  
+```
 do the set and the the get, use correct addresseses
