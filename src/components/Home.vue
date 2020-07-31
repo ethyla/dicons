@@ -1,47 +1,87 @@
 <template>
-  <v-form>
-    <v-container>
-      <v-row align="center">
-        <v-col class="text-center" cols="5">
+  <v-container fluid>
+    <v-row align="center" justify="center">
+      <v-col cols="4">
+        <v-card-title>
+          Register an icon for your smart contract
+        </v-card-title>
+        <v-card-text>
           <v-text-field
-            label="Address"
-            v-model="searchAddress"
-            solo
+            v-model="scAddress"
+            name="Smart Contract Address"
+            label="Smart Contract Address"
+            placeholder="0x6090A6e47849629b7245Dfa1Ca21D94cd15878Ef"
           ></v-text-field>
-        </v-col>
-
-        <v-col class="text-center" cols="2">
-          <v-btn small color="primary" @click="getSomeValue">Get</v-btn>
-        </v-col>
-
-        <v-col class="text-center" cols="5">
-          <v-text-field label="Value" v-model="searchValue" solo></v-text-field>
-        </v-col>
-      </v-row>
-      <v-row align="center">
-        <v-col class="text-center" cols="5">
           <v-text-field
-            label="Address"
-            v-model="targetAddress"
-            solo
+            v-model="scName"
+            name="Smart Contract Name"
+            label="Smart Contract Name"
+            placeholder="ENS"
           ></v-text-field>
-        </v-col>
-
-        <v-col class="text-center" cols="5">
+          <v-text-field
+            v-model="scType"
+            name="Smart Contract Type"
+            label="Smart Contract Type"
+            placeholder="ERC20"
+          ></v-text-field>
           <v-file-input
             @change="addFiles()"
             label="File input"
             v-model="files"
           ></v-file-input>
           <v-img :src="uploadedImg" contain></v-img>
-          <!-- <v-text-field label="Value" v-model="targetValue" solo></v-text-field> -->
-        </v-col>
-        <v-col class="text-center" cols="2">
-          <v-btn small color="primary" @click="uploadPinata">Set</v-btn>
-        </v-col>
-      </v-row>
-    </v-container>
-  </v-form>
+        </v-card-text>
+        <v-card-actions>
+          <v-btn small color="primary" @click="uploadPinata">Register</v-btn>
+        </v-card-actions>
+      </v-col>
+    </v-row>
+  </v-container>
+  <!-- 
+    <v-form>
+      <v-container>
+        <v-row align="center">
+          <v-col class="text-center" cols="5">
+            <v-text-field
+              label="Address"
+              v-model="searchAddress"
+              solo
+            ></v-text-field>
+          </v-col>
+
+          <v-col class="text-center" cols="2">
+            <v-btn small color="primary" @click="getSomeValue">Get</v-btn>
+          </v-col>
+
+          <v-col class="text-center" cols="5">
+            <v-text-field label="Value" v-model="searchValue" solo></v-text-field>
+          </v-col>
+        </v-row>
+        <v-row align="center">
+          <v-col class="text-center" cols="5">
+            <v-text-field
+              label="Address"
+              v-model="targetAddress"
+              solo
+            ></v-text-field>
+          </v-col>
+
+          <v-col class="text-center" cols="5">
+            <v-file-input
+              @change="addFiles()"
+              label="File input"
+              v-model="files"
+            ></v-file-input>
+            <v-img :src="uploadedImg" contain></v-img>
+            <v-text-field label="Value" v-model="targetValue" solo></v-text-field> -->
+  <!-- </v-col>
+          <v-col class="text-center" cols="2">
+            
+          </v-col>
+        </v-row>
+      </v-container>
+    </v-form> -->
+  <!-- </div> -->
 </template>
 
 <script>
@@ -52,6 +92,9 @@ import FormData from "form-data";
 export default {
   data() {
     return {
+      scAddress: "",
+      scName: "",
+      scType: "",
       searchAddress: "",
       searchValue: "",
       targetAddress: "",
@@ -84,6 +127,9 @@ export default {
       let pinataApiKey = "24e61ab582bad9ed68ba";
       let pinataSecretApiKey =
         "00de21ef13501946f234b914316320efc380807387e3ae91bbe6b3e9fa5c66e2";
+      const scAddress = this.scAddress;
+      const scName = this.scName;
+      const scType = this.scType;
 
       const url = `https://api.pinata.cloud/pinning/pinFileToIPFS`;
 
@@ -105,8 +151,12 @@ export default {
           }
         })
         .then(function(response) {
-          console.log(response);
-          //handle response here
+          console.log("Pinata response:", response);
+          console.log("Address", scAddress);
+          console.log("Name", scName);
+          console.log("Type", scType);
+          console.log("IPFS Hash", response.data.IpfsHash);
+          //TODO: Here we need to register the information in the smart contract!
         })
         .catch(function(error) {
           console.log(error);
