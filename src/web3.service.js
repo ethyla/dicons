@@ -12,10 +12,13 @@ export async function getValueFromAdd(address) {
   return contract.methods.registry(address).call();
 }
 
-export async function setValueToAdd(address, value) {
-  let sendAccount = await web3.eth.getAccounts();
-  console.log(address);
-  await contract.methods
-    .setRegistryValue(address, value)
-    .send({ from: sendAccount[0] });
+export async function registerIcon(address, path, name, type) {
+  const sendAccount = await web3.eth.getAccounts();
+  const result = await contract.methods
+    .setRegistryValue(address, path, name, type)
+    .send({ from: sendAccount[0], gas: 200000 });
+  if (result.transactionHash !== undefined) {
+    return true;
+  }
+  return false;
 }
