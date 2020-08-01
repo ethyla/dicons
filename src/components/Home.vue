@@ -10,13 +10,13 @@
             v-model="scAddress"
             name="Smart Contract Address"
             label="Smart Contract Address"
-            placeholder="0x6090A6e47849629b7245Dfa1Ca21D94cd15878Ef"
+            placeholder="0x9f8f72aa9304c8b593d555f12ef6589cc3a579a2"
           ></v-text-field>
           <v-text-field
             v-model="scName"
             name="Smart Contract Name"
             label="Smart Contract Name"
-            placeholder="ENS"
+            placeholder="Maker"
           ></v-text-field>
           <v-text-field
             v-model="scType"
@@ -33,6 +33,13 @@
         </v-card-text>
         <v-card-actions>
           <v-btn small color="primary" @click="uploadPinata">Register</v-btn>
+          <v-spacer></v-spacer>
+          <v-btn :color="color1" depressed icon :loading="loading1">
+            <v-icon>cloud_upload</v-icon>
+          </v-btn>
+          <v-btn :color="color2" depressed icon :loading="loading2">
+            <v-icon>playlist_add</v-icon>
+          </v-btn>
         </v-card-actions>
       </v-col>
     </v-row>
@@ -85,16 +92,20 @@
 </template>
 
 <script>
-import { setValueToAdd, getValueFromAdd } from "../web3.service";
+import { registerIcon, getValueFromAdd } from "../web3.service";
 import axios from "axios";
 import FormData from "form-data";
 
 export default {
   data() {
     return {
-      scAddress: "",
-      scName: "",
-      scType: "",
+      scAddress: "0x9f8f72aa9304c8b593d555f12ef6589cc3a579a2",
+      scName: "Maker",
+      scType: "ERC20",
+      loading1: false,
+      loading2: false,
+      color1: "red",
+      color2: "red",
       searchAddress: "",
       searchValue: "",
       targetAddress: "",
@@ -106,7 +117,7 @@ export default {
   },
   methods: {
     async setSomeValue() {
-      await setValueToAdd(this.targetAddress, this.targetValue);
+      await registerIcon(this.targetAddress, this.targetValue);
     },
     async getSomeValue() {
       let value = await getValueFromAdd(this.searchAddress);
@@ -124,12 +135,11 @@ export default {
       this.readers[0].readAsDataURL(this.files);
     },
     uploadPinata() {
+      this.loading1 = true;
       let pinataApiKey = "24e61ab582bad9ed68ba";
       let pinataSecretApiKey =
         "00de21ef13501946f234b914316320efc380807387e3ae91bbe6b3e9fa5c66e2";
-      const scAddress = this.scAddress;
-      const scName = this.scName;
-      const scType = this.scType;
+      const vueComponentInstance = this;
 
       const url = `https://api.pinata.cloud/pinning/pinFileToIPFS`;
 
@@ -150,13 +160,25 @@ export default {
             pinata_secret_api_key: pinataSecretApiKey
           }
         })
-        .then(function(response) {
-          console.log("Pinata response:", response);
-          console.log("Address", scAddress);
-          console.log("Name", scName);
-          console.log("Type", scType);
-          console.log("IPFS Hash", response.data.IpfsHash);
-          //TODO: Here we need to register the information in the smart contract!
+        .then(async response => {
+          //TODO: Tests for a missing input
+          vueComponentInstance.loading1 = false;
+          vueComponentInstance.color1 = "green";
+          vueComponentInstance.loading2 = true;
+          await registerIcon(
+            vueComponentInstance.scAddress,
+            response.data.IpfsHash,
+            vueComponentInstance.scName,
+            vueComponentInstance.scType
+          );
+          // reseting the inputs
+          vueComponentInstance.scName = "";
+          vueComponentInstance.scAddress = "";
+          vueComponentInstance.scType = "";
+          // stoping the loading animation
+          vueComponentInstance.loading2 = false;
+          // and setting to green
+          vueComponentInstance.color2 = "green";
         })
         .catch(function(error) {
           console.log(error);
