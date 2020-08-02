@@ -22,3 +22,7 @@ export async function registerIcon(address, path, name, type) {
   }
   return false;
 }
+
+export async function getSmartContractAddresses() {
+  return contract.methods.getSCAddresses().call();
+}

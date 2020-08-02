@@ -44,55 +44,10 @@
       </v-col>
     </v-row>
   </v-container>
-  <!-- 
-    <v-form>
-      <v-container>
-        <v-row align="center">
-          <v-col class="text-center" cols="5">
-            <v-text-field
-              label="Address"
-              v-model="searchAddress"
-              solo
-            ></v-text-field>
-          </v-col>
-
-          <v-col class="text-center" cols="2">
-            <v-btn small color="primary" @click="getSomeValue">Get</v-btn>
-          </v-col>
-
-          <v-col class="text-center" cols="5">
-            <v-text-field label="Value" v-model="searchValue" solo></v-text-field>
-          </v-col>
-        </v-row>
-        <v-row align="center">
-          <v-col class="text-center" cols="5">
-            <v-text-field
-              label="Address"
-              v-model="targetAddress"
-              solo
-            ></v-text-field>
-          </v-col>
-
-          <v-col class="text-center" cols="5">
-            <v-file-input
-              @change="addFiles()"
-              label="File input"
-              v-model="files"
-            ></v-file-input>
-            <v-img :src="uploadedImg" contain></v-img>
-            <v-text-field label="Value" v-model="targetValue" solo></v-text-field> -->
-  <!-- </v-col>
-          <v-col class="text-center" cols="2">
-            
-          </v-col>
-        </v-row>
-      </v-container>
-    </v-form> -->
-  <!-- </div> -->
 </template>
 
 <script>
-import { registerIcon, getValueFromAdd } from "../web3.service";
+import { registerIcon } from "../web3.service";
 import axios from "axios";
 import FormData from "form-data";
 
@@ -106,23 +61,12 @@ export default {
       loading2: false,
       color1: "red",
       color2: "red",
-      searchAddress: "",
-      searchValue: "",
-      targetAddress: "",
-      targetValue: "",
       files: [],
       readers: [],
       uploadedImg: ""
     };
   },
   methods: {
-    async setSomeValue() {
-      await registerIcon(this.targetAddress, this.targetValue);
-    },
-    async getSomeValue() {
-      let value = await getValueFromAdd(this.searchAddress);
-      this.searchValue = value;
-    },
     addFiles() {
       console.log("files", this.files);
       this.readers[0] = new FileReader();
@@ -145,7 +89,6 @@ export default {
 
       let data = new FormData();
       data.append("file", dataURItoBlob(this.uploadedImg));
-
       const metadata = JSON.stringify({
         name: "test dog"
       });
@@ -165,6 +108,7 @@ export default {
           vueComponentInstance.loading1 = false;
           vueComponentInstance.color1 = "green";
           vueComponentInstance.loading2 = true;
+          // register icon in smart contract
           await registerIcon(
             vueComponentInstance.scAddress,
             response.data.IpfsHash,
@@ -179,6 +123,7 @@ export default {
           vueComponentInstance.loading2 = false;
           // and setting to green
           vueComponentInstance.color2 = "green";
+          vueComponentInstance.$store.commit("registeredIcon", true);
         })
         .catch(function(error) {
           console.log(error);
@@ -204,14 +149,6 @@ function dataURItoBlob(dataURI) {
   for (var i = 0; i < byteString.length; i++) {
     ia[i] = byteString.charCodeAt(i);
   }
-
-  //Old Code
-  //write the ArrayBuffer to a blob, and you're done
-  //var bb = new BlobBuilder();
-  //bb.append(ab);
-  //return bb.getBlob(mimeString);
-
-  //New Code
   return new Blob([ab], { type: mimeString });
 }
 </script>

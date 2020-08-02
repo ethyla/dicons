@@ -9,19 +9,22 @@
     </v-app-bar>
 
     <v-main>
-      <Home />
+      <RegisterIcon />
+      <ListIcons />
     </v-main>
   </v-app>
 </template>
 
 <script>
-import Home from "./components/Home";
+import RegisterIcon from "./components/RegisterIcon";
+import ListIcons from "./components/ListIcons";
 
 export default {
   name: "App",
 
   components: {
-    Home
+    RegisterIcon,
+    ListIcons
   },
 
   data: () => ({
