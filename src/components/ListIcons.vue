@@ -3,13 +3,13 @@
     <v-row>
       <v-col cols="4" v-for="item in entries" :key="item['0']">
         <v-card>
-          <v-img
-            class="white--text align-end"
-            height="200px"
-            src="https://ipfs.io/ipfs/QmaJgmftU7RYSVNPxMrfzfrZWrG8jqeMzQPBPDTdcpJvAX"
-          />
+          <v-card-title>
+            <v-avatar>
+              <img :src="'https://ipfs.io/ipfs/' + item.path" />
+            </v-avatar>
+            {{ item.name }}
+          </v-card-title>
           <v-card-text class="text--primary">
-            <div>Name: {{ item.name }}</div>
             <div>Type: {{ item.type }}</div>
             <div>Path: {{ item.path }}</div>
             <div>Address: {{ item.address }}</div>

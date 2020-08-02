@@ -30,15 +30,17 @@
             v-model="files"
           ></v-file-input>
           <v-img :src="uploadedImg" contain></v-img>
+
+          <v-alert :type="status1" icon="cloud_upload" dense>
+            {{ alert1Text }}
+          </v-alert>
+          <v-alert :type="status2" icon="playlist_add" dense>
+            {{ alert2Text }}
+          </v-alert>
         </v-card-text>
         <v-card-actions>
-          <v-btn small color="primary" @click="uploadPinata">Register</v-btn>
-          <v-spacer></v-spacer>
-          <v-btn :color="color1" depressed icon :loading="loading1">
-            <v-icon>cloud_upload</v-icon>
-          </v-btn>
-          <v-btn :color="color2" depressed icon :loading="loading2">
-            <v-icon>playlist_add</v-icon>
+          <v-btn small color="primary" @click="uploadPinata" :loading="loading">
+            Register
           </v-btn>
         </v-card-actions>
       </v-col>
@@ -57,10 +59,11 @@ export default {
       scAddress: "0x9f8f72aa9304c8b593d555f12ef6589cc3a579a2",
       scName: "Maker",
       scType: "ERC20",
-      loading1: false,
-      loading2: false,
-      color1: "red",
-      color2: "red",
+      loading: false,
+      status1: "info",
+      status2: "info",
+      alert1Text: "Upload status",
+      alert2Text: "Registration status",
       files: [],
       readers: [],
       uploadedImg: ""
@@ -73,16 +76,31 @@ export default {
       this.readers[0].onloadend = () => {
         let fileData = this.readers[0].result;
 
-        console.log(fileData);
+        console.log('Filedata:', fileData);
         this.uploadedImg = fileData;
       };
       this.readers[0].readAsDataURL(this.files);
     },
     uploadPinata() {
-      this.loading1 = true;
-      let pinataApiKey = "24e61ab582bad9ed68ba";
-      let pinataSecretApiKey =
-        "00de21ef13501946f234b914316320efc380807387e3ae91bbe6b3e9fa5c66e2";
+      this.loading = true;
+      if (
+        this.scAddress === "" ||
+        this.scName === "" ||
+        this.scType === "" ||
+        this.uploadedImg === ""
+      ) {
+        this.alert1Text = "Check that your input is complete";
+        this.alert2Text = "Registration stauts";
+        this.status1 = "error";
+        this.status2 = "info";
+        this.loading = false;
+        return;
+      }
+      this.alert1Text = "Upload status";
+      this.status1 = "info";
+
+      let pinataApiKey = process.env.VUE_APP_PINATA_API_KEY;
+      let pinataSecretApiKey = process.env.VUE_APP_PINATA_API_SECRET;
       const vueComponentInstance = this;
 
       const url = `https://api.pinata.cloud/pinning/pinFileToIPFS`;
@@ -104,10 +122,8 @@ export default {
           }
         })
         .then(async response => {
-          //TODO: Tests for a missing input
-          vueComponentInstance.loading1 = false;
-          vueComponentInstance.color1 = "green";
-          vueComponentInstance.loading2 = true;
+          vueComponentInstance.status1 = "success";
+          console.log(response.data.IpfsHash);
           // register icon in smart contract
           await registerIcon(
             vueComponentInstance.scAddress,
@@ -119,15 +135,22 @@ export default {
           vueComponentInstance.scName = "";
           vueComponentInstance.scAddress = "";
           vueComponentInstance.scType = "";
-          // stoping the loading animation
-          vueComponentInstance.loading2 = false;
-          // and setting to green
-          vueComponentInstance.color2 = "green";
+          vueComponentInstance.status2 = "success";
           vueComponentInstance.$store.commit("registeredIcon", true);
+          vueComponentInstance.loading = false;
         })
         .catch(function(error) {
-          console.log(error);
-          //handle error here
+          if (
+            error.message ===
+            "Returned error: VM Exception while processing transaction: revert"
+          ) {
+            vueComponentInstance.status2 = "error";
+            vueComponentInstance.alert2Text =
+              "Are you the owner of the contract?";
+            //TODO: Unpin the hash
+          }
+          console.log(error.message);
+          vueComponentInstance.loading = false;
         });
     }
   }

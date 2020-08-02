@@ -9,6 +9,7 @@ contract IconRegistry {
     string _name;
     string _path;
     string _type;
+    bool isSet;
   }
 
   constructor() public {
@@ -29,7 +30,8 @@ contract IconRegistry {
       Owner c = Owner(_target);
       // check if the sender of the transaction is the owner of the smart contract
       require(c.owner() == msg.sender, 'You are not the owner of the contract');
-      registry[_target] = SmartContractInformation(_name, _path, _type);
+      require(registry[_target].isSet == false, 'Icon has been already registered');
+      registry[_target] = SmartContractInformation(_name, _path, _type, true);
       scAddresses.push(_target);
   }
 
