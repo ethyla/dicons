@@ -1,5 +1,8 @@
 # dicons
 
+Running at: https://royal-disk-8394.on.fleek.co/
+Or at: https://ipfs.fleek.co/ipfs/QmSQsTjm6BQdT3eNeDtmZAuYUSJNC11cArDUecRqThsHxG
+
 ## Project setup
 ```
 npm install
