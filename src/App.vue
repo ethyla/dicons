@@ -27,8 +27,6 @@ export default {
     ListIcons
   },
 
-  data: () => ({
-    //
-  })
+  data: () => ({})
 };
 </script>

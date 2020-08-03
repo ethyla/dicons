@@ -84,7 +84,7 @@ export default {
       this.readers[0].onloadend = () => {
         let fileData = this.readers[0].result;
 
-        // console.log('Filedata:', fileData);
+        // console.log("Filedata:", fileData);
         this.uploadedImg = fileData;
       };
       this.readers[0].readAsDataURL(this.files);
