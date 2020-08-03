@@ -24,12 +24,20 @@
             label="Smart Contract Type"
             placeholder="ERC20"
           ></v-text-field>
-          <v-file-input
-            @change="addFiles()"
-            label="File input"
-            v-model="files"
-          ></v-file-input>
-          <v-img :src="uploadedImg" contain></v-img>
+          <div class="d-flex flex-no-wrap justify-space-between">
+            <v-file-input
+              class="w-50"
+              @change="addFiles()"
+              label="File input"
+              v-model="files"
+            ></v-file-input>
+            <v-img
+              :src="uploadedImg"
+              height="32px"
+              contain
+              class="pt-12 mt-2"
+            ></v-img>
+          </div>
 
           <v-alert :type="status1" icon="cloud_upload" dense>
             {{ alert1Text }}
@@ -71,12 +79,12 @@ export default {
   },
   methods: {
     addFiles() {
-      console.log("files", this.files);
+      // console.log("files", this.files);
       this.readers[0] = new FileReader();
       this.readers[0].onloadend = () => {
         let fileData = this.readers[0].result;
 
-        console.log('Filedata:', fileData);
+        // console.log('Filedata:', fileData);
         this.uploadedImg = fileData;
       };
       this.readers[0].readAsDataURL(this.files);
@@ -176,4 +184,4 @@ function dataURItoBlob(dataURI) {
 }
 </script>
 
-<style lang="scss" scoped></style>
+<style scoped></style>
