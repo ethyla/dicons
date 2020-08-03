@@ -120,6 +120,8 @@ export default {
       });
       data.append("pinataMetadata", metadata);
 
+      let ipfsHash = "";
+
       return axios
         .post(url, data, {
           maxContentLength: "Infinity", //this is needed to prevent axios from erroring out with large files
@@ -131,11 +133,12 @@ export default {
         })
         .then(async response => {
           vueComponentInstance.status1 = "success";
-          console.log(response.data.IpfsHash);
+          vueComponentInstance.alert1Text = "Successfully uploaded";
+          ipfsHash = response.data.IpfsHash;
           // register icon in smart contract
           await registerIcon(
             vueComponentInstance.scAddress,
-            response.data.IpfsHash,
+            ipfsHash,
             vueComponentInstance.scName,
             vueComponentInstance.scType
           );
@@ -143,11 +146,13 @@ export default {
           vueComponentInstance.scName = "";
           vueComponentInstance.scAddress = "";
           vueComponentInstance.scType = "";
+          vueComponentInstance.files = [];
+          vueComponentInstance.uploadedImg = "";
           vueComponentInstance.status2 = "success";
           vueComponentInstance.$store.commit("registeredIcon", true);
           vueComponentInstance.loading = false;
         })
-        .catch(function(error) {
+        .catch(async function(error) {
           if (
             error.message ===
             "Returned error: VM Exception while processing transaction: revert"
@@ -155,7 +160,12 @@ export default {
             vueComponentInstance.status2 = "error";
             vueComponentInstance.alert2Text =
               "Are you the owner of the contract?";
-            //TODO: Unpin the hash
+            const result = await unpinIpfsHash(ipfsHash);
+            if (result) {
+              vueComponentInstance.alert1Text = "Successfully removed data";
+            } else {
+              vueComponentInstance.alert1Text = "Error while removing data";
+            }
           }
           console.log(error.message);
           vueComponentInstance.loading = false;
@@ -181,6 +191,27 @@ function dataURItoBlob(dataURI) {
     ia[i] = byteString.charCodeAt(i);
   }
   return new Blob([ab], { type: mimeString });
+}
+
+async function unpinIpfsHash(hashToUnpin) {
+  const url = `https://api.pinata.cloud/pinning/unpin/${hashToUnpin}`;
+  return axios
+    .delete(url, {
+      headers: {
+        "pinata_api_key": process.env.VUE_APP_PINATA_API_KEY,
+        "pinata_secret_api_key": process.env.VUE_APP_PINATA_API_SECRET
+      }
+    })
+    .then(function(response) {
+      //handle response here
+      console.log("Response", response);
+      return true;
+    })
+    .catch(function(error) {
+      //handle error here
+      console.log("Error while unpinning", error);
+      return false;
+    });
 }
 </script>
 
