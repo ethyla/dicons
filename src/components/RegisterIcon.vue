@@ -57,7 +57,7 @@
 </template>
 
 <script>
-import { registerIcon } from "../web3.service";
+import { registerIcon, getValueFromAdd } from "../web3.service";
 import axios from "axios";
 import FormData from "form-data";
 
@@ -89,7 +89,7 @@ export default {
       };
       this.readers[0].readAsDataURL(this.files);
     },
-    uploadPinata() {
+    async uploadPinata() {
       this.loading = true;
       if (
         this.scAddress === "" ||
@@ -104,7 +104,15 @@ export default {
         this.loading = false;
         return;
       }
-      this.alert1Text = "Upload status";
+      const registeredData = await getValueFromAdd(this.scAddress);
+      if (registeredData.isSet) {
+        this.alert1Text = "Smart Contract has already an icon";
+        this.status1 = "error";
+        this.loading = false;
+        return;
+      }
+
+      this.alert1Text = "Uploading...";
       this.status1 = "info";
 
       let pinataApiKey = process.env.VUE_APP_PINATA_API_KEY;
@@ -198,7 +206,9 @@ async function unpinIpfsHash(hashToUnpin) {
   return axios
     .delete(url, {
       headers: {
+        // eslint-disable-next-line
         "pinata_api_key": process.env.VUE_APP_PINATA_API_KEY,
+        // eslint-disable-next-line
         "pinata_secret_api_key": process.env.VUE_APP_PINATA_API_SECRET
       }
     })
