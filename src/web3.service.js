@@ -1,23 +1,61 @@
 import Web3 from "web3";
 import contractData from "../truffle/build/contracts/IconRegistry.json";
 
-let web3 = new Web3("ws://localhost:8545");
+const infuraKey = process.env["VUE_APP_INFURA_API"];
+const { ethereum } = window;
+let account;
+
+const isMetaMaskInstalled = () => {
+  return Boolean(ethereum && ethereum.isMetaMask);
+};
+
+if (isMetaMaskInstalled()) {
+  console.log("MetaMask is installed!");
+} else {
+  console.log("no mm");
+}
+
+let web3 = new Web3("https://goerli.infura.io/v3/" + infuraKey);
 
 let contract = new web3.eth.Contract(
   contractData.abi,
-  contractData.networks[1337].address
+  contractData.networks[5].address
 );
+
+export async function getMMAccount() {
+  let accounts = await ethereum.request({ method: "eth_requestAccounts" });
+  account = accounts[0];
+  return account;
+}
 
 export async function getValueFromAdd(address) {
   return contract.methods.registry(address).call();
 }
 
 export async function registerIcon(address, path, name, type) {
-  const sendAccount = await web3.eth.getAccounts();
-  const result = await contract.methods
+  const txData = await contract.methods
     .setRegistryValue(address, path, name, type)
-    .send({ from: sendAccount[0], gas: 200000 });
-  if (result.transactionHash !== undefined) {
+    .encodeABI();
+  // const gasLimit = await contract.methods
+  //   .setRegistryValue(address, path, name, type)
+  //   .estimateGas();
+  let gasLimit = "50000";
+  console.log(contract);
+  const transactionParameters = {
+    gasPrice: "0x09184e72a0", // customizable by user during MetaMask confirmation.
+    gas: gasLimit, // customizable by user during MetaMask confirmation.
+    to: contract.options.address, // Required except during contract publications.
+    from: ethereum.selectedAddress, // must match user's active address.
+    data: txData,
+    chainId: 5
+  };
+  console.log(transactionParameters);
+  const txHash = await ethereum.request({
+    method: "eth_sendTransaction",
+    params: [transactionParameters]
+  });
+  console.log(txHash);
+  if (txHash !== undefined) {
     return true;
   }
   return false;

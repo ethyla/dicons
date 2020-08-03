@@ -2,7 +2,7 @@ require("dotenv").config({ path: "../.env" });
 const HDWalletProvider = require("@truffle/hdwallet-provider");
 
 const mnemonic = process.env["MNEMONIC"];
-const infuraKey = process.env["INFURA_API"];
+const infuraKey = process.env["VUE_APP_INFURA_API"];
 
 module.exports = {
   networks: {

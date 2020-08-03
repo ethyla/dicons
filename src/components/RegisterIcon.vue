@@ -47,6 +47,9 @@
           </v-alert>
         </v-card-text>
         <v-card-actions>
+          <v-btn small color="primary" @click="connectMM" :loading="loadingMM">
+            Connect MetaMask
+          </v-btn>
           <v-btn small color="primary" @click="uploadPinata" :loading="loading">
             Register
           </v-btn>
@@ -57,7 +60,7 @@
 </template>
 
 <script>
-import { registerIcon, getValueFromAdd } from "../web3.service";
+import { registerIcon, getMMAccount, getValueFromAdd } from "../web3.service";
 import axios from "axios";
 import FormData from "form-data";
 
@@ -68,6 +71,7 @@ export default {
       scName: "Maker",
       scType: "ERC20",
       loading: false,
+      loadingMM: false,
       status1: "info",
       status2: "info",
       alert1Text: "Upload status",
@@ -78,6 +82,13 @@ export default {
     };
   },
   methods: {
+    connectMM() {
+      this.loadingMM = true;
+      getMMAccount().then(account => {
+        console.log(account);
+      });
+      this.loadingMM = false;
+    },
     addFiles() {
       // console.log("files", this.files);
       this.readers[0] = new FileReader();
@@ -98,7 +109,7 @@ export default {
         this.uploadedImg === ""
       ) {
         this.alert1Text = "Check that your input is complete";
-        this.alert2Text = "Registration stauts";
+        this.alert2Text = "Registration status";
         this.status1 = "error";
         this.status2 = "info";
         this.loading = false;
