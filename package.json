@@ -12,7 +12,7 @@
     "@babel/polyfill": "^7.4.4",
     "@pinata/sdk": "^1.1.10",
     "@truffle/hdwallet-provider": "^1.0.40",
-    "axios": "^0.19.2",
+    "axios": "^0.21.1",
     "core-js": "^3.6.5",
     "dotenv": "^8.2.0",
     "roboto-fontface": "*",
